@@ -90,16 +90,43 @@ def main():
         print(f"     tenga que ESPERAR antes de ser atendido.")
         print()
 
-        # Bonus: tiempo de espera promedio
-        H = input("⏱️  ¿Quieres calcular el tiempo de espera promedio W?\n   Ingresa la duración media de llamada H en segundos (o Enter para omitir): ")
-        if H.strip() != "":
+        # Bonus: tiempo de espera promedio W y P(W > W0)
+        print()
+        H_input = input("⏱️  ¿Quieres calcular W y P(W>W0)?\n   Ingresa H (duración media de llamada en segundos) o Enter para omitir: ")
+        if H_input.strip() != "":
             try:
-                H = float(H)
-                W = (c * H) / (N - A)
+                H_val = float(H_input)
+
+                # Tiempo promedio de espera
+                W = (c * H_val) / (N - A)
                 print(f"\n  ⏳ Tiempo promedio de espera W = {W:.2f} segundos")
                 print(f"     (Para TODOS los clientes, incluyendo los que no esperan)")
+
+                # P(W > W0)
+                W0_input = input("\n🎯  Ingresa W0 (tiempo objetivo en segundos): ")
+                W0 = float(W0_input)
+
+                import math
+                exponente = -(N - A) * (W0 / H_val)
+                e_term = math.exp(exponente)
+                P = c * e_term
+
+                print()
+                print("=" * 60)
+                print("       📋 CÁLCULO DE P(W > W0)")
+                print("=" * 60)
+                print(f"  C(N,A)               = {c:.4f}")
+                print(f"  -(N-A) * W0/H        = -({N}-{A}) * {W0}/{H_val} = {exponente:.4f}")
+                print(f"  e^({exponente:.4f})         = {e_term:.4f}")
+                print()
+                print(f"  ✅ P(W > {W0}s) = {c:.4f} × {e_term:.4f} = {P:.4f}  →  {P*100:.2f}%")
+                print()
+                print(f"  📌 El {P*100:.2f}% de clientes esperará MÁS de {W0} segundos.")
+                print(f"     El {(1-P)*100:.2f}% será atendido en {W0} segundos o menos.")
+                print("=" * 60)
+
             except ValueError:
-                print("  ⚠️  Valor inválido, se omite el cálculo de W.")
+                print("  ⚠️  Valor inválido, se omite el cálculo.")
 
     print("\n¿Deseas calcular con otros valores?")
     otra = input("Escribe 'si' para repetir o cualquier tecla para salir: ").strip().lower()
