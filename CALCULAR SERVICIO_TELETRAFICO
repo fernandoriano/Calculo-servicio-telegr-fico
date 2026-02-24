@@ -1,0 +1,114 @@
+import math
+
+def erlang_c(N, A):
+    """
+    Calcula la fórmula de Erlang C: C(N, A)
+    
+    N : número de agentes (entero)
+    A : tráfico ofrecido en Erlangs (float)
+    """
+    
+    if N <= A:
+        print(f"\n⚠️  ERROR: N debe ser mayor que A para que el sistema sea estable.")
+        print(f"   N={N} no es mayor que A={A}. El sistema colapsaría (cola infinita).")
+        return None
+
+    # --- Numerador: A^N ---
+    numerador = A ** N
+
+    # --- Término 1 del denominador: A^N ---
+    termino1 = A ** N
+
+    # --- Término 2: N! * (1 - A/N) * sumatoria ---
+    factorial_N = math.factorial(N)
+    factor = 1 - (A / N)
+
+    sumatoria = 0
+    print("\n📊 Cálculo de la sumatoria Σ(A^k / k!) para k=0 hasta N-1:")
+    print(f"{'k':<5} {'A^k':<20} {'k!':<15} {'A^k / k!':<15}")
+    print("-" * 55)
+    for k in range(N):
+        ak = A ** k
+        kf = math.factorial(k)
+        termino = ak / kf
+        sumatoria += termino
+        print(f"{k:<5} {ak:<20.4f} {kf:<15} {termino:<15.4f}")
+
+    termino2 = factorial_N * factor * sumatoria
+
+    # --- Denominador total ---
+    denominador = termino1 + termino2
+
+    # --- Resultado ---
+    resultado = numerador / denominador
+
+    return resultado, sumatoria, factorial_N, factor, termino1, termino2, denominador
+
+
+def main():
+    print("=" * 60)
+    print("       CALCULADORA DE ERLANG C  →  C(N, A)")
+    print("=" * 60)
+    print()
+    print("  Fórmula:")
+    print("               A^N")
+    print("  C(N,A) = ─────────────────────────────────")
+    print("            A^N + N! · (1 - A/N) · Σ(A^k/k!)")
+    print()
+
+    while True:
+        try:
+            N = int(input("🔢 Ingresa N (número de agentes, entero): "))
+            A = float(input("📶 Ingresa A (tráfico en Erlangs, puede ser decimal con punto): "))
+            break
+        except ValueError:
+            print("❌ Valor inválido. N debe ser entero y A debe ser número decimal.\n")
+
+    resultado = erlang_c(N, A)
+
+    if resultado is not None:
+        c, sumatoria, fact_N, factor, t1, t2, denom = resultado
+
+        print()
+        print("=" * 60)
+        print("              📋 RESUMEN DEL CÁLCULO")
+        print("=" * 60)
+        print(f"  N (agentes)          = {N}")
+        print(f"  A (tráfico Erlangs)  = {A}")
+        print(f"  A^N                  = {A**N:.4f}")
+        print(f"  N!                   = {fact_N}")
+        print(f"  (1 - A/N)            = {factor:.4f}")
+        print(f"  Sumatoria Σ(A^k/k!)  = {sumatoria:.4f}")
+        print(f"  Numerador            = {t1:.4f}")
+        print(f"  Denominador          = {denom:.4f}")
+        print()
+        print(f"  ✅ C({N}, {A}) = {c:.4f}  →  {c*100:.2f}%")
+        print("=" * 60)
+        print()
+        print(f"  📌 Interpretación: Con {N} agentes y {A} Erlangs de tráfico,")
+        print(f"     hay un {c*100:.2f}% de probabilidad de que un cliente")
+        print(f"     tenga que ESPERAR antes de ser atendido.")
+        print()
+
+        # Bonus: tiempo de espera promedio
+        H = input("⏱️  ¿Quieres calcular el tiempo de espera promedio W?\n   Ingresa la duración media de llamada H en segundos (o Enter para omitir): ")
+        if H.strip() != "":
+            try:
+                H = float(H)
+                W = (c * H) / (N - A)
+                print(f"\n  ⏳ Tiempo promedio de espera W = {W:.2f} segundos")
+                print(f"     (Para TODOS los clientes, incluyendo los que no esperan)")
+            except ValueError:
+                print("  ⚠️  Valor inválido, se omite el cálculo de W.")
+
+    print("\n¿Deseas calcular con otros valores?")
+    otra = input("Escribe 'si' para repetir o cualquier tecla para salir: ").strip().lower()
+    if otra == "si":
+        print()
+        main()
+    else:
+        print("\n👋 ¡Hasta luego!")
+
+
+if __name__ == "__main__":
+    main()
